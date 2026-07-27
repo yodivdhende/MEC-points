@@ -1,0 +1,168 @@
+/*
+  Theme inspired by meclarp.com (Myrddin Emrys: Magical College LARP).
+  Palette and typefaces are pulled from the live site's stylesheet:
+  warm parchment backgrounds, ink-brown text, a rust accent, and a
+  deep teal secondary — dressed in Playfair Display headings over
+  Poppins/Raleway body text, in keeping with a "magical academia" feel.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:wght@200;300;400;500;600&family=Raleway:wght@400;500;600&display=swap');
+
+:root {
+	/* Colors — sampled from meclarp.com */
+	--color-ink: #391b0f; /* body text */
+	--color-bark: #694d38; /* headings, primary */
+	--color-rust: #7f3d1d; /* accent / CTA */
+	--color-teal: #2b5672; /* secondary accent / links */
+	--color-tan: #b2a183; /* muted / borders */
+	--color-sand: #c9b3a4; /* subtle fills */
+	--color-parchment: #ebe5e2; /* page background */
+	--color-parchment-light: #f8f8f8; /* card background */
+	--color-white: #ffffff;
+
+	/* Typography */
+	--font-display: 'Playfair Display', 'Georgia', serif;
+	--font-body: 'Poppins', 'Raleway', system-ui, sans-serif;
+	--font-accent: 'Raleway', system-ui, sans-serif;
+
+	/* Shape & elevation */
+	--radius-sm: 8px;
+	--radius-lg: 20px;
+	--radius-pill: 999px;
+	--shadow-card: 0 4px 20px rgba(57, 27, 15, 0.12);
+
+	/* Spacing scale */
+	--space-1: 0.5rem;
+	--space-2: 1rem;
+	--space-3: 1.5rem;
+	--space-4: 2.5rem;
+	--space-5: 4rem;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0;
+}
+
+body {
+	background: var(--color-parchment);
+	color: var(--color-ink);
+	font-family: var(--font-body);
+	font-weight: 300;
+	font-size: 1rem;
+	line-height: 1.65;
+	-webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	font-family: var(--font-display);
+	color: var(--color-bark);
+	font-weight: 700;
+	line-height: 1.2;
+	margin: 0 0 var(--space-2);
+}
+
+h1 {
+	font-size: clamp(2.25rem, 4vw, 3.5rem);
+	font-style: italic;
+}
+
+h2 {
+	font-size: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+h3 {
+	font-size: 1.375rem;
+}
+
+p {
+	margin: 0 0 var(--space-2);
+}
+
+a {
+	color: var(--color-teal);
+	text-decoration: none;
+	border-bottom: 1px solid transparent;
+	transition: border-color 0.15s ease;
+}
+
+a:hover {
+	border-bottom-color: currentColor;
+}
+
+/* Small uppercase label, e.g. above a heading */
+.eyebrow {
+	display: inline-block;
+	font-family: var(--font-accent);
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--color-rust);
+	margin-bottom: var(--space-1);
+}
+
+/* Parchment card, e.g. for content panels */
+.card {
+	background: var(--color-parchment-light);
+	border: 1px solid var(--color-tan);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-card);
+	padding: var(--space-3);
+}
+
+/* Pill buttons, matching the site's rounded CTAs */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5em;
+	font-family: var(--font-accent);
+	font-weight: 500;
+	font-size: 0.9375rem;
+	letter-spacing: 0.02em;
+	padding: 0.75em 1.75em;
+	border-radius: var(--radius-pill);
+	border: 1px solid transparent;
+	cursor: pointer;
+	transition:
+		background-color 0.15s ease,
+		color 0.15s ease,
+		border-color 0.15s ease;
+}
+
+.btn-primary {
+	background: var(--color-rust);
+	color: var(--color-white);
+}
+
+.btn-primary:hover {
+	background: var(--color-bark);
+}
+
+.btn-outline {
+	background: transparent;
+	color: var(--color-bark);
+	border-color: var(--color-bark);
+}
+
+.btn-outline:hover {
+	background: var(--color-bark);
+	color: var(--color-white);
+}
+
+hr {
+	border: none;
+	border-top: 1px solid var(--color-tan);
+	margin: var(--space-4) 0;
+}
