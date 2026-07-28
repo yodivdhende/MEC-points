@@ -27,9 +27,9 @@ MEC-Points is a webapp for tracking and displaying **house points** at a magical
 
 ## Data model
 
-- `professors` — `id`, `name`, `active`.
-- `houses` — `id`, `name`, `slug` (stable key used to seed the 5 fixed houses and to look up their crest asset), `points` (cached running total, clamped to -99..999).
-- `point_transactions` — `id`, `houseId`, `professorId`, `delta`, `createdAt`. One row per submitted point change; `houses.points` is kept in sync with it inside a DB transaction (`applyPointDelta` in `src/lib/server/db/houses.ts`).
+- `professors` — `id` (UUID), `name`, `active`.
+- `houses` — `id` (UUID), `name`, `slug` (stable key used to seed the 5 fixed houses and to look up their crest asset), `points` (cached running total, clamped to -99..999).
+- `point_transactions` — `id` (UUID), `houseId`, `professorId`, `delta`, `createdAt`. One row per submitted point change; `houses.points` is kept in sync with it inside a DB transaction (`applyPointDelta` in `src/lib/server/db/houses.ts`).
 - The 5 houses are seeded via `pnpm db:seed` (`src/lib/server/db/seed.ts`), which is idempotent (`onConflictDoNothing` on `slug`) and must be run manually after `pnpm db:push` on a fresh database — nothing seeds them automatically.
 - Point clamping logic (`MIN_POINTS`/`MAX_POINTS`/`clampPoints`) lives in `src/lib/util/points.ts`, shared by both client (optimistic UI) and server (authoritative validation). `src/lib/util/` is for simple, dependency-light exported helpers in general (see its own CLAUDE.md).
 

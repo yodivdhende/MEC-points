@@ -16,7 +16,7 @@ export async function listInactiveProfessors(): Promise<Professor[]> {
 	});
 }
 
-export async function getProfessorById(id: number): Promise<Professor | undefined> {
+export async function getProfessorById(id: string): Promise<Professor | undefined> {
 	return db.query.professors.findFirst({ where: eq(professors.id, id) });
 }
 
@@ -25,6 +25,6 @@ export async function insertProfessor(name: string): Promise<Professor> {
 	return row;
 }
 
-export async function setProfessorActive(id: number, active: boolean): Promise<void> {
+export async function setProfessorActive(id: string, active: boolean): Promise<void> {
 	await db.update(professors).set({ active }).where(eq(professors.id, id));
 }

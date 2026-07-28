@@ -8,8 +8,8 @@ export async function listHouses(): Promise<House[]> {
 }
 
 export async function applyPointDelta(
-	houseId: number,
-	professorId: number,
+	houseId: string,
+	professorId: string,
 	delta: number
 ): Promise<House> {
 	return db.transaction(async (tx) => {
