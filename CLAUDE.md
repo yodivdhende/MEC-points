@@ -13,7 +13,8 @@ MEC-Points is a webapp for tracking and displaying **house points** at a magical
 - **SvelteKit** (Svelte 5, TypeScript) — app framework
 - **Drizzle ORM** + **Postgres** — data layer (`src/lib/server/db/`)
 - **pnpm** — package manager
-- Schema changes go through Drizzle migrations (`pnpm db:generate` then `pnpm db:push`), not manual/hand-edited SQL. `pnpm db:studio` opens a DB browser for inspecting/adjusting data.
+- Schema changes go through Drizzle migrations (`pnpm db:generate` then `pnpm db:push` locally), not manual/hand-edited SQL. `pnpm db:studio` opens a DB browser for inspecting/adjusting data.
+- **Deployment (Railway):** the generated SQL migrations in `drizzle/` are applied to the production database automatically via `pnpm db:migrate` (`src/lib/server/db/migrate.ts`, using `drizzle-orm`'s migrator), configured as the Railway service's Pre-Deploy Command — it runs before each new deploy starts serving traffic. Seeding the 5 houses (`pnpm db:seed`) is still a manual, one-time step on a fresh database.
 
 ## Core Features
 
