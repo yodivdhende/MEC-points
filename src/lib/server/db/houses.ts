@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { db } from './index';
 import { houses, pointTransactions, type House } from './schema';
-import { clampPoints } from '$lib/points';
+import { clampPoints } from '$lib/util/points';
 
 export async function listHouses(): Promise<House[]> {
 	return db.query.houses.findMany({ orderBy: (h, { asc }) => [asc(h.name)] });

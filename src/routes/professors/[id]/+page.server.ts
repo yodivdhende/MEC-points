@@ -2,7 +2,7 @@ import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getProfessorById } from '$lib/server/db/professors';
 import { listHouses, applyPointDelta } from '$lib/server/db/houses';
-import { MIN_POINTS, MAX_POINTS } from '$lib/points';
+import { MIN_POINTS, MAX_POINTS } from '$lib/util/points';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const id = Number(params.id);

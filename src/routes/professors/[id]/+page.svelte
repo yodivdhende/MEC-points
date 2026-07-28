@@ -2,7 +2,7 @@
 	import { deserialize } from '$app/forms';
 	import { onDestroy } from 'svelte';
 	import type { PageData } from './$types';
-	import { clampPoints } from '$lib/points';
+	import { clampPoints } from '$lib/util/points';
 	import alcertis from '$lib/assets/Alcertis colour_PNG.png';
 	import ibidens from '$lib/assets/Ibidens colour_PNG.png';
 	import lutridus from '$lib/assets/Lutridus colour_PNG.png';
