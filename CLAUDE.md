@@ -19,13 +19,22 @@ MEC-Points is a webapp for tracking and displaying **house points** at a magical
 
 1. **House overview screen** — a display-only screen showing all 5 houses, each with its shield/crest and current point total (range -99 to 999). Meant to be shown publicly (e.g. on a screen in a common area).
 
-2. **Professor point submission** — each professor has their own page to submit point changes (positive or negative) to a house. This is how house totals get updated.
+2. **Professor point submission** — *(implemented)* each professor has their own page (`/professors/[id]`) to submit point changes (positive or negative) to a house. This is how house totals get updated. The page lists the 5 houses with add/subtract buttons; taps update the display instantly and are batched into a single request per house after 5 seconds of inactivity (`src/routes/professors/[id]/+page.svelte`, `actions.adjust` in `+page.server.ts`). Every change is recorded in `point_transactions` (house, professor, delta, timestamp) alongside a denormalized running total on `houses.points`, which is what makes the statistics screen below feasible without re-summing history on every read.
 
-3. **Statistics screen** — shows historical trends: which house has earned or lost the most points over a given period, and which professor has awarded the most points overall.
+3. **Statistics screen** — shows historical trends: which house has earned or lost the most points over a given period, and which professor has awarded the most points overall. Not yet built, but the `point_transactions` table already stores everything this needs.
 
 4. **Yearly score reset** — professors can clear/reset all house point totals (e.g. at the end of a school year). Because this is destructive and irreversible, it must be gated behind a clear confirmation warning before it executes.
+
+## Data model
+
+- `professors` — `id`, `name`, `active`.
+- `houses` — `id`, `name`, `slug` (stable key used to seed the 5 fixed houses and to look up their crest asset), `points` (cached running total, clamped to -99..999).
+- `point_transactions` — `id`, `houseId`, `professorId`, `delta`, `createdAt`. One row per submitted point change; `houses.points` is kept in sync with it inside a DB transaction (`applyPointDelta` in `src/lib/server/db/houses.ts`).
+- The 5 houses are seeded via `pnpm db:seed` (`src/lib/server/db/seed.ts`), which is idempotent (`onConflictDoNothing` on `slug`) and must be run manually after `pnpm db:push` on a fresh database — nothing seeds them automatically.
+- Point clamping logic (`MIN_POINTS`/`MAX_POINTS`/`clampPoints`) lives in `src/lib/points.ts`, shared by both client (optimistic UI) and server (authoritative validation).
 
 ## Notes for Future Changes
 
 - This document describes the intended scope, not necessarily what's fully implemented yet — update it as features are built out or the scope evolves.
 - Any change to the database schema should be made via Drizzle migrations, keeping migration history intact for both local dev and deployment.
+- There is currently no authentication — a professor's page is reachable by anyone who knows/guesses `/professors/[id]`. This is a known gap, not an oversight; revisit if/when auth is added to scope.
