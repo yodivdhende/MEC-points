@@ -17,7 +17,7 @@ MEC-Points is a webapp for tracking and displaying **house points** at a magical
 
 ## Core Features
 
-1. **House overview screen** — a display-only screen showing all 5 houses, each with its shield/crest and current point total (range -99 to 999). Meant to be shown publicly (e.g. on a screen in a common area).
+1. **House overview screen** — *(implemented)* a display-only screen showing all 5 houses side by side, each with its shield/crest and current point total (range -99 to 999, always rendered as 3 characters). Meant to be shown publicly (e.g. on a screen in a common area), and stays live via Server-Sent Events so it never needs a manual refresh. See `src/routes/houses/CLAUDE.md` for the SSE implementation.
 
 2. **Professor point submission** — *(implemented)* each professor has their own page to submit point changes (positive or negative) to a house. This is how house totals get updated. Every change is recorded in `point_transactions` (house, professor, delta, timestamp) alongside a denormalized running total on `houses.points`, which is what makes the statistics screen below feasible without re-summing history on every read. See `src/routes/professors/CLAUDE.md` for implementation details.
 
@@ -28,7 +28,7 @@ MEC-Points is a webapp for tracking and displaying **house points** at a magical
 ## Data model
 
 - `professors` — `id` (UUID), `name`, `active`.
-- `houses` — `id` (UUID), `name`, `slug` (stable key used to seed the 5 fixed houses and to look up their crest asset), `points` (cached running total, clamped to -99..999).
+- `houses` — `id` (UUID), `name`, `slug` (stable key used to seed the 5 fixed houses and to look up their crest asset via `src/lib/assets/crests.ts`), `points` (cached running total, clamped to -99..999).
 - `point_transactions` — `id` (UUID), `houseId`, `professorId`, `delta`, `createdAt`. One row per submitted point change; `houses.points` is kept in sync with it inside a DB transaction (`applyPointDelta` in `src/lib/server/db/houses.ts`).
 - The 5 houses are seeded via `pnpm db:seed` (`src/lib/server/db/seed.ts`), which is idempotent (`onConflictDoNothing` on `slug`) and must be run manually after `pnpm db:push` on a fresh database — nothing seeds them automatically.
 - Point clamping logic (`MIN_POINTS`/`MAX_POINTS`/`clampPoints`) lives in `src/lib/util/points.ts`, shared by both client (optimistic UI) and server (authoritative validation). `src/lib/util/` is for simple, dependency-light exported helpers in general (see its own CLAUDE.md).
