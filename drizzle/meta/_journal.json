@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1785228406354,
-      "tag": "0000_overconfident_the_hand",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1785230284804,
-      "tag": "0001_overrated_starfox",
+      "when": 1785237151285,
+      "tag": "0000_low_ultimatum",
       "breakpoints": true
     }
   ]

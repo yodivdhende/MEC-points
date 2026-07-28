@@ -12,7 +12,7 @@ const SAVED_LABEL_MS = 2000;
  * page unload so pending taps aren't lost.
  */
 export class HousePoints {
-	readonly id: number;
+	readonly id: string;
 	readonly name: string;
 	readonly slug: string;
 
@@ -22,7 +22,7 @@ export class HousePoints {
 
 	#timer: ReturnType<typeof setTimeout> | null = null;
 
-	constructor(house: { id: number; name: string; slug: string; points: number }) {
+	constructor(house: { id: string; name: string; slug: string; points: number }) {
 		this.id = house.id;
 		this.name = house.name;
 		this.slug = house.slug;

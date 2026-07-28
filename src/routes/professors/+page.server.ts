@@ -6,6 +6,7 @@ import {
 	insertProfessor,
 	setProfessorActive
 } from '$lib/server/db/professors';
+import { isUuid } from '$lib/util/is-uuid';
 
 export const load: PageServerLoad = async () => {
 	const [active, inactive] = await Promise.all([listActiveProfessors(), listInactiveProfessors()]);
@@ -24,8 +25,8 @@ export const actions: Actions = {
 	},
 
 	deactivate: async ({ request }) => {
-		const id = Number((await request.formData()).get('id'));
-		if (!Number.isInteger(id)) {
+		const id = String((await request.formData()).get('id') ?? '');
+		if (!isUuid(id)) {
 			return fail(400, { action: 'deactivate', error: 'Invalid professor.' });
 		}
 		await setProfessorActive(id, false);
@@ -33,8 +34,8 @@ export const actions: Actions = {
 	},
 
 	reactivate: async ({ request }) => {
-		const id = Number((await request.formData()).get('id'));
-		if (!Number.isInteger(id)) {
+		const id = String((await request.formData()).get('id') ?? '');
+		if (!isUuid(id)) {
 			return fail(400, { action: 'reactivate', error: 'Invalid professor.' });
 		}
 		await setProfessorActive(id, true);

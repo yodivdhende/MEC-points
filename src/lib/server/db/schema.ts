@@ -1,24 +1,24 @@
-import { pgTable, serial, text, boolean, integer, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, boolean, integer, timestamp } from 'drizzle-orm/pg-core';
 
 export const professors = pgTable('professors', {
-	id: serial('id').primaryKey(),
+	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
 	active: boolean('active').notNull().default(true)
 });
 
 export const houses = pgTable('houses', {
-	id: serial('id').primaryKey(),
+	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
 	slug: text('slug').notNull().unique(),
 	points: integer('points').notNull().default(0)
 });
 
 export const pointTransactions = pgTable('point_transactions', {
-	id: serial('id').primaryKey(),
-	houseId: integer('house_id')
+	id: uuid('id').primaryKey().defaultRandom(),
+	houseId: uuid('house_id')
 		.notNull()
 		.references(() => houses.id),
-	professorId: integer('professor_id')
+	professorId: uuid('professor_id')
 		.notNull()
 		.references(() => professors.id),
 	delta: integer('delta').notNull(),
