@@ -3,13 +3,7 @@
 	import type { PageData } from './$types';
 	import { HousePoints } from '$lib/state/house-points.svelte';
 	import HouseCard from '$lib/components/HouseCard.svelte';
-	import alcertis from '$lib/assets/Alcertis colour_PNG.png';
-	import ibidens from '$lib/assets/Ibidens colour_PNG.png';
-	import lutridus from '$lib/assets/Lutridus colour_PNG.png';
-	import paventia from '$lib/assets/Paventia colour_PNG.png';
-	import luvium from '$lib/assets/Luvium colour_PNG.png';
-
-	const crests: Record<string, string> = { alcertis, ibidens, lutridus, paventia, luvium };
+	import { crests } from '$lib/assets/crests';
 
 	let { data }: { data: PageData } = $props();
 
