@@ -3,6 +3,7 @@
 	import { onDestroy } from 'svelte';
 	import type { PageData } from './$types';
 	import { clampPoints } from '$lib/util/points';
+	import HouseCard from '$lib/components/HouseCard.svelte';
 	import alcertis from '$lib/assets/Alcertis colour_PNG.png';
 	import ibidens from '$lib/assets/Ibidens colour_PNG.png';
 	import lutridus from '$lib/assets/Lutridus colour_PNG.png';
@@ -106,13 +107,6 @@
 			if (house.timer) clearTimeout(house.timer);
 		}
 	});
-
-	const statusLabel: Record<HouseRow['status'], string> = {
-		idle: '',
-		saving: 'Saving…',
-		saved: 'Saved',
-		error: 'Save failed — will retry'
-	};
 </script>
 
 <section class="page">
@@ -121,34 +115,14 @@
 
 	<ul class="house-list">
 		{#each houseRows as house (house.id)}
-			<li class="card house-row">
-				<img class="crest" src={crests[house.slug]} alt="{house.name} crest" />
-
-				<div class="house-info">
-					<span class="house-name">{house.name}</span>
-					<span class="status status-{house.status}">{statusLabel[house.status]}</span>
-				</div>
-
-				<div class="controls">
-					<button
-						type="button"
-						class="btn btn-outline point-btn"
-						aria-label="Subtract a point from {house.name}"
-						onclick={() => bump(house, -1)}
-					>
-						&minus;
-					</button>
-					<span class="points">{house.displayed}</span>
-					<button
-						type="button"
-						class="btn btn-primary point-btn"
-						aria-label="Add a point to {house.name}"
-						onclick={() => bump(house, 1)}
-					>
-						+
-					</button>
-				</div>
-			</li>
+			<HouseCard
+				name={house.name}
+				crestSrc={crests[house.slug]}
+				points={house.displayed}
+				status={house.status}
+				onIncrement={() => bump(house, 1)}
+				onDecrement={() => bump(house, -1)}
+			/>
 		{/each}
 	</ul>
 </section>
@@ -167,80 +141,5 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);
-	}
-
-	.house-row {
-		display: flex;
-		align-items: center;
-		gap: var(--space-2);
-		padding: var(--space-2);
-	}
-
-	.crest {
-		width: 3rem;
-		height: 3rem;
-		object-fit: contain;
-		flex-shrink: 0;
-	}
-
-	.house-info {
-		display: flex;
-		flex-direction: column;
-		flex: 1;
-		min-width: 0;
-	}
-
-	.house-name {
-		font-family: var(--font-display);
-		font-weight: 700;
-		font-size: clamp(1.05rem, 3vw, 1.25rem);
-		color: var(--color-bark);
-	}
-
-	.status {
-		font-family: var(--font-accent);
-		font-size: 0.75rem;
-		color: var(--color-teal);
-		min-height: 1em;
-	}
-
-	.status-error {
-		color: var(--color-rust);
-	}
-
-	.controls {
-		display: flex;
-		align-items: center;
-		gap: var(--space-1);
-		flex-shrink: 0;
-	}
-
-	.point-btn {
-		width: 3rem;
-		height: 3rem;
-		padding: 0;
-		font-size: 1.5rem;
-		line-height: 1;
-		flex-shrink: 0;
-	}
-
-	.points {
-		min-width: 3ch;
-		text-align: center;
-		font-family: var(--font-display);
-		font-weight: 700;
-		font-size: 1.375rem;
-		color: var(--color-ink);
-	}
-
-	@media (max-width: 420px) {
-		.house-row {
-			flex-wrap: wrap;
-		}
-
-		.controls {
-			width: 100%;
-			justify-content: center;
-		}
 	}
 </style>
