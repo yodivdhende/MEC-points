@@ -6,6 +6,7 @@ import {
 	insertProfessor,
 	setProfessorActive
 } from '$lib/server/db/professors';
+import { resetAllHousePoints } from '$lib/server/db/houses';
 import { isUuid } from '$lib/util/is-uuid';
 
 export const load: PageServerLoad = async () => {
@@ -40,5 +41,10 @@ export const actions: Actions = {
 		}
 		await setProfessorActive(id, true);
 		return { action: 'reactivate', success: true };
+	},
+
+	resetAll: async () => {
+		await resetAllHousePoints();
+		return { action: 'resetAll', success: true };
 	}
 };

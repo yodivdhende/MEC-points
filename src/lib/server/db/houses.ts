@@ -10,7 +10,7 @@ export async function listHouses(): Promise<House[]> {
 
 export async function applyPointDelta(
 	houseId: string,
-	professorId: string,
+	professorId: string | null,
 	delta: number
 ): Promise<House> {
 	const updated = await db.transaction(async (tx) => {
@@ -29,5 +29,18 @@ export async function applyPointDelta(
 	});
 
 	publishHouseUpdate(updated);
+	return updated;
+}
+
+// Zeroes every house's points as part of a yearly reset. professorId is null
+// on these transaction rows since the trigger isn't tied to one professor;
+// any future "points awarded per professor" query must filter those out.
+export async function resetAllHousePoints(): Promise<House[]> {
+	const all = await listHouses();
+	const updated: House[] = [];
+	for (const house of all) {
+		if (house.points === 0) continue;
+		updated.push(await applyPointDelta(house.id, null, -house.points));
+	}
 	return updated;
 }
