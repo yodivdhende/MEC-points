@@ -28,7 +28,7 @@
 </script>
 
 <section class="page">
-	<span class="eyebrow">Point submission</span>
+	<a href="/professors" class="back-link eyebrow">&larr; Back to professors</a>
 	<h1>{data.professor.name}</h1>
 
 	<ul class="house-list">
@@ -50,6 +50,12 @@
 		max-width: 32rem;
 		margin: 0 auto;
 		padding: var(--space-4) var(--space-2);
+	}
+
+	.back-link {
+		display: inline-block;
+		font-size: 0.875rem;
+		margin-bottom: var(--space-2);
 	}
 
 	.house-list {

@@ -8,7 +8,6 @@
 </script>
 
 <section class="page">
-	<span class="eyebrow">Faculty</span>
 	<h1>Professors</h1>
 
 	<ul class="professor-list">
@@ -59,7 +58,6 @@
 			<p class="error">{form.error}</p>
 		{/if}
 	</div>
-
 </section>
 
 <style>
