@@ -28,7 +28,7 @@
 </script>
 
 <section class="page">
-	<a href="/professors" class="back-link eyebrow">&larr; Back to professors</a>
+	<!-- <a href="/professors" class="back-link eyebrow">&larr; Back to professors</a> -->
 	<h1>{data.professor.name}</h1>
 
 	<ul class="house-list">
