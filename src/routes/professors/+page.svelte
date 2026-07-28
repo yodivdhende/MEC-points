@@ -13,14 +13,6 @@
 <section class="page">
 	<h1>Professors</h1>
 
-	<div class="card reset-card">
-		<h3>Reset house points</h3>
-		<p>Zero out every house's point total, e.g. at the end of a school year.</p>
-		<button type="button" class="btn btn-danger-outline" onclick={() => (showResetConfirm = true)}>
-			Reset all house points
-		</button>
-	</div>
-
 	<form
 		method="POST"
 		action="?/resetAll"
@@ -89,6 +81,14 @@
 		{#if form?.action === 'add' && form?.error}
 			<p class="error">{form.error}</p>
 		{/if}
+	</div>
+
+	<div class="card reset-card">
+		<h3>Reset house points</h3>
+		<p>Zero out every house's point total, e.g. at the end of a school year.</p>
+		<button type="button" class="btn btn-danger-outline" onclick={() => (showResetConfirm = true)}>
+			Reset all house points
+		</button>
 	</div>
 </section>
 
