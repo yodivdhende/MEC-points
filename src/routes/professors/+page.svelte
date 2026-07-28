@@ -11,17 +11,6 @@
 	<span class="eyebrow">Faculty</span>
 	<h1>Professors</h1>
 
-	<div class="card add-card">
-		<h3>Add Professor</h3>
-		<form method="POST" action="?/add" use:enhance class="add-form">
-			<input type="text" name="name" placeholder="Professor name" required />
-			<button type="submit" class="btn btn-primary">Add Professor</button>
-		</form>
-		{#if form?.action === 'add' && form?.error}
-			<p class="error">{form.error}</p>
-		{/if}
-	</div>
-
 	<ul class="professor-list">
 		{#each data.active as professor (professor.id)}
 			<li class="card professor-row">
@@ -59,6 +48,18 @@
 			</ul>
 		{/if}
 	{/if}
+
+	<div class="card add-card">
+		<h3>Add Professor</h3>
+		<form method="POST" action="?/add" use:enhance class="add-form">
+			<input type="text" name="name" placeholder="Professor name" required />
+			<button type="submit" class="btn btn-primary">Add Professor</button>
+		</form>
+		{#if form?.action === 'add' && form?.error}
+			<p class="error">{form.error}</p>
+		{/if}
+	</div>
+
 </section>
 
 <style>
