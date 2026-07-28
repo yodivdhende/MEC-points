@@ -2,6 +2,7 @@
 	import type { PageData } from './$types';
 	import { crests } from '$lib/assets/crests';
 	import HouseOverviewCard from '$lib/components/HouseOverviewCard.svelte';
+	import backgroundVideo from '$lib/assets/background.mp4';
 
 	let { data }: { data: PageData } = $props();
 
@@ -19,6 +20,8 @@
 </script>
 
 <section class="page">
+	<!-- svelte-ignore a11y_media_has_caption -->
+	<video class="background-video" src={backgroundVideo} autoplay loop muted playsinline></video>
 	<ul class="house-row">
 		{#each houses as house (house.id)}
 			<HouseOverviewCard name={house.name} crestSrc={crests[house.slug]} points={house.points} />
@@ -28,10 +31,21 @@
 
 <style>
 	.page {
+		position: relative;
 		min-height: 100vh;
 		display: flex;
 		align-items: center;
 		padding: var(--space-4);
+		overflow: hidden;
+	}
+
+	.background-video {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		z-index: -1;
 	}
 
 	.house-row {
