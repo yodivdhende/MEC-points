@@ -19,7 +19,7 @@ MEC-Points is a webapp for tracking and displaying **house points** at a magical
 
 1. **House overview screen** — a display-only screen showing all 5 houses, each with its shield/crest and current point total (range -99 to 999). Meant to be shown publicly (e.g. on a screen in a common area).
 
-2. **Professor point submission** — *(implemented)* each professor has their own page (`/professors/[id]`) to submit point changes (positive or negative) to a house. This is how house totals get updated. The page lists the 5 houses with add/subtract buttons; taps update the display instantly and are batched into a single request per house after 5 seconds of inactivity (`src/routes/professors/[id]/+page.svelte`, `actions.adjust` in `+page.server.ts`). Every change is recorded in `point_transactions` (house, professor, delta, timestamp) alongside a denormalized running total on `houses.points`, which is what makes the statistics screen below feasible without re-summing history on every read.
+2. **Professor point submission** — *(implemented)* each professor has their own page to submit point changes (positive or negative) to a house. This is how house totals get updated. Every change is recorded in `point_transactions` (house, professor, delta, timestamp) alongside a denormalized running total on `houses.points`, which is what makes the statistics screen below feasible without re-summing history on every read. See `src/routes/professors/CLAUDE.md` for implementation details.
 
 3. **Statistics screen** — shows historical trends: which house has earned or lost the most points over a given period, and which professor has awarded the most points overall. Not yet built, but the `point_transactions` table already stores everything this needs.
 
@@ -37,4 +37,3 @@ MEC-Points is a webapp for tracking and displaying **house points** at a magical
 
 - This document describes the intended scope, not necessarily what's fully implemented yet — update it as features are built out or the scope evolves.
 - Any change to the database schema should be made via Drizzle migrations, keeping migration history intact for both local dev and deployment.
-- There is currently no authentication — a professor's page is reachable by anyone who knows/guesses `/professors/[id]`. This is a known gap, not an oversight; revisit if/when auth is added to scope.
