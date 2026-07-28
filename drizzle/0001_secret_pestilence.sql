@@ -1,0 +1,1 @@
+ALTER TABLE "point_transactions" ALTER COLUMN "professor_id" DROP NOT NULL;

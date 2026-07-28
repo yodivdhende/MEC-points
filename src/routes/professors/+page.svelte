@@ -1,14 +1,38 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { PageData, ActionData } from './$types';
+	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	let showDeactivated = $state(false);
+	let showResetConfirm = $state(false);
+	let resetForm: HTMLFormElement | undefined = $state();
 </script>
 
 <section class="page">
 	<h1>Professors</h1>
+
+	<form
+		method="POST"
+		action="?/resetAll"
+		use:enhance={() => {
+			return async ({ update }) => {
+				await update();
+				showResetConfirm = false;
+			};
+		}}
+		bind:this={resetForm}
+	></form>
+
+	<ConfirmDialog
+		open={showResetConfirm}
+		title="Reset all house points?"
+		message="This sets every house's point total back to 0 and cannot be undone."
+		confirmLabel="Reset points"
+		onConfirm={() => resetForm?.requestSubmit()}
+		onCancel={() => (showResetConfirm = false)}
+	/>
 
 	<ul class="professor-list">
 		{#each data.active as professor (professor.id)}
@@ -58,6 +82,14 @@
 			<p class="error">{form.error}</p>
 		{/if}
 	</div>
+
+	<div class="card reset-card">
+		<h3>Reset house points</h3>
+		<p>Zero out every house's point total, e.g. at the end of a school year.</p>
+		<button type="button" class="btn btn-danger-outline" onclick={() => (showResetConfirm = true)}>
+			Reset all house points
+		</button>
+	</div>
 </section>
 
 <style>
@@ -69,6 +101,21 @@
 
 	.add-card {
 		margin-bottom: var(--space-3);
+	}
+
+	.reset-card {
+		margin-bottom: var(--space-3);
+	}
+
+	.btn-danger-outline {
+		background: transparent;
+		color: var(--color-rust);
+		border-color: var(--color-rust);
+	}
+
+	.btn-danger-outline:hover {
+		background: var(--color-rust);
+		color: var(--color-white);
 	}
 
 	.add-form {

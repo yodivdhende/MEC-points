@@ -22,8 +22,8 @@
 	}
 
 	.crest {
-		width: clamp(4rem, 10vw, 9rem);
-		height: clamp(4rem, 10vw, 9rem);
+		width: clamp(4rem, 20vw, 20rem);
+		height: clamp(4rem, 20vw, 20rem);
 		object-fit: contain;
 	}
 
