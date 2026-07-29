@@ -12,7 +12,7 @@ This page also has a "Reset all house points" button, for the yearly score reset
 
 ## Student management — `/professors`
 
-Same page also lists all students with `addStudent`/`removeStudent` form actions, backed by `src/lib/server/db/students.ts`. Unlike professors, students aren't referenced by any other table (no attribution to preserve), so removal is a hard `DELETE` rather than a soft-deactivate — gated behind the same `ConfirmDialog` used for the house-points reset, since it's irreversible. There's no house assignment on a student yet; add one (a `houseId` FK) only when a feature actually needs it.
+Same page also lists all students with `addStudent`/`removeStudent` form actions, backed by `src/lib/server/db/students.ts`. Unlike professors, students aren't referenced by any other table (no attribution to preserve), so removal is a hard `DELETE` rather than a soft-deactivate — gated behind the same `ConfirmDialog` used for the house-points reset, since it's irreversible. Every student belongs to exactly one house (`houseId`, required); the add form has a house `<select>` (populated from `listHouses()`, also loaded on this page) and `listStudents()` joins in the house row so it can be shown per student.
 
 ## Point submission — `/professors/[id]`
 

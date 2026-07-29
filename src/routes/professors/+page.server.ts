@@ -7,16 +7,17 @@ import {
 	setProfessorActive
 } from '$lib/server/db/professors';
 import { listStudents, insertStudent, deleteStudent } from '$lib/server/db/students';
-import { resetAllHousePoints } from '$lib/server/db/houses';
+import { listHouses, resetAllHousePoints } from '$lib/server/db/houses';
 import { isUuid } from '$lib/util/is-uuid';
 
 export const load: PageServerLoad = async () => {
-	const [active, inactive, students] = await Promise.all([
+	const [active, inactive, students, houses] = await Promise.all([
 		listActiveProfessors(),
 		listInactiveProfessors(),
-		listStudents()
+		listStudents(),
+		listHouses()
 	]);
-	return { active, inactive, students };
+	return { active, inactive, students, houses };
 };
 
 export const actions: Actions = {
@@ -56,10 +57,14 @@ export const actions: Actions = {
 	addStudent: async ({ request }) => {
 		const form = await request.formData();
 		const name = (form.get('name') ?? '').toString().trim();
+		const houseId = String(form.get('houseId') ?? '');
 		if (!name) {
 			return fail(400, { action: 'addStudent', error: 'Name is required.', name });
 		}
-		await insertStudent(name);
+		if (!isUuid(houseId)) {
+			return fail(400, { action: 'addStudent', error: 'House is required.', name });
+		}
+		await insertStudent(name, houseId);
 		return { action: 'addStudent', success: true };
 	},
 

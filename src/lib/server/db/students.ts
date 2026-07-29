@@ -1,13 +1,24 @@
-import { eq } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 import { db } from './index';
-import { students, type Student } from './schema';
+import { students, houses, type Student, type House } from './schema';
 
-export async function listStudents(): Promise<Student[]> {
-	return db.query.students.findMany({ orderBy: (s, { asc }) => [asc(s.name)] });
+export type StudentWithHouse = Student & { house: House };
+
+export async function listStudents(): Promise<StudentWithHouse[]> {
+	return db
+		.select({
+			id: students.id,
+			name: students.name,
+			houseId: students.houseId,
+			house: houses
+		})
+		.from(students)
+		.innerJoin(houses, eq(students.houseId, houses.id))
+		.orderBy(asc(students.name));
 }
 
-export async function insertStudent(name: string): Promise<Student> {
-	const [row] = await db.insert(students).values({ name }).returning();
+export async function insertStudent(name: string, houseId: string): Promise<Student> {
+	const [row] = await db.insert(students).values({ name, houseId }).returning();
 	return row;
 }
 

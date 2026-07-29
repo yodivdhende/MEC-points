@@ -6,16 +6,19 @@ export const professors = pgTable('professors', {
 	active: boolean('active').notNull().default(true)
 });
 
-export const students = pgTable('students', {
-	id: uuid('id').primaryKey().defaultRandom(),
-	name: text('name').notNull()
-});
-
 export const houses = pgTable('houses', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
 	slug: text('slug').notNull().unique(),
 	points: integer('points').notNull().default(0)
+});
+
+export const students = pgTable('students', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	name: text('name').notNull(),
+	houseId: uuid('house_id')
+		.notNull()
+		.references(() => houses.id)
 });
 
 export const pointTransactions = pgTable('point_transactions', {

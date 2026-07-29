@@ -114,7 +114,7 @@
 	<ul class="professor-list">
 		{#each data.students as student (student.id)}
 			<li class="card professor-row">
-				<span>{student.name}</span>
+				<span>{student.name} <span class="house-tag">({student.house.name})</span></span>
 				<button
 					type="button"
 					class="btn btn-outline btn-small"
@@ -132,6 +132,12 @@
 		<h3>Add Student</h3>
 		<form method="POST" action="?/addStudent" use:enhance class="add-form">
 			<input type="text" name="name" placeholder="Student name" required />
+			<select name="houseId" required>
+				<option value="" disabled selected>House</option>
+				{#each data.houses as house (house.id)}
+					<option value={house.id}>{house.name}</option>
+				{/each}
+			</select>
 			<button type="submit" class="btn btn-primary">Add Student</button>
 		</form>
 		{#if form?.action === 'addStudent' && form?.error}
@@ -185,6 +191,19 @@
 		border: 1px solid var(--color-tan);
 		border-radius: var(--radius-sm);
 		font-family: var(--font-body);
+	}
+
+	.add-form select {
+		padding: 0.6em 1em;
+		border: 1px solid var(--color-tan);
+		border-radius: var(--radius-sm);
+		font-family: var(--font-body);
+		background: var(--color-white);
+	}
+
+	.house-tag {
+		opacity: 0.7;
+		font-size: 0.875rem;
 	}
 
 	.error {
