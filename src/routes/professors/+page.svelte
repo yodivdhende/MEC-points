@@ -14,151 +14,179 @@
 </script>
 
 <section class="page">
-	<h1>Professors</h1>
+	<div class="professors">
+		<h1>Professors</h1>
 
-	<form
-		method="POST"
-		action="?/resetAll"
-		use:enhance={() => {
-			return async ({ update }) => {
-				await update();
-				showResetConfirm = false;
-			};
-		}}
-		bind:this={resetForm}
-	></form>
+		<ul class="professor-list">
+			{#each data.active as professor (professor.id)}
+				<li class="card professor-row">
+					<a href="/professors/{professor.id}">{professor.name}</a>
+					<form method="POST" action="?/deactivate" use:enhance>
+						<input type="hidden" name="id" value={professor.id} />
+						<button type="submit" class="btn btn-outline btn-small">Deactivate</button>
+					</form>
+				</li>
+			{:else}
+				<p>No professors yet. Add one above.</p>
+			{/each}
+		</ul>
 
-	<ConfirmDialog
-		open={showResetConfirm}
-		title="Reset all house points?"
-		message="This sets every house's point total back to 0 and cannot be undone."
-		confirmLabel="Reset points"
-		onConfirm={() => resetForm?.requestSubmit()}
-		onCancel={() => (showResetConfirm = false)}
-	/>
+		{#if data.inactive.length > 0}
+			<button
+				type="button"
+				class="expand-toggle"
+				onclick={() => (showDeactivated = !showDeactivated)}
+			>
+				{showDeactivated ? 'Hide' : 'Show'} deactivated professors ({data.inactive.length})
+			</button>
 
-	<form
-		method="POST"
-		action="?/removeStudent"
-		use:enhance={() => {
-			return async ({ update }) => {
-				await update();
-				studentToRemove = null;
-			};
-		}}
-		bind:this={removeStudentForm}
-	>
-		<input type="hidden" name="id" value={studentToRemove?.id ?? ''} />
-	</form>
+			{#if showDeactivated}
+				<ul class="professor-list deactivated">
+					{#each data.inactive as professor (professor.id)}
+						<li class="card professor-row muted">
+							<span>{professor.name}</span>
+							<form method="POST" action="?/reactivate" use:enhance>
+								<input type="hidden" name="id" value={professor.id} />
+								<button type="submit" class="btn btn-outline btn-small">Reactivate</button>
+							</form>
+						</li>
+					{/each}
+				</ul>
+			{/if}
+		{/if}
 
-	<ConfirmDialog
-		open={studentToRemove !== null}
-		title="Remove student?"
-		message={`This permanently removes ${studentToRemove?.name ?? 'this student'} and cannot be undone.`}
-		confirmLabel="Remove student"
-		onConfirm={() => removeStudentForm?.requestSubmit()}
-		onCancel={() => (studentToRemove = null)}
-	/>
+		<div class="card add-card">
+			<h3>Add Professor</h3>
+			<form method="POST" action="?/add" use:enhance class="add-form">
+				<input type="text" name="name" placeholder="Professor name" required />
+				<button type="submit" class="btn btn-primary">Add Professor</button>
+			</form>
+			{#if form?.action === 'add' && form?.error}
+				<p class="error">{form.error}</p>
+			{/if}
+		</div>
+	</div>
 
-	<ul class="professor-list">
-		{#each data.active as professor (professor.id)}
-			<li class="card professor-row">
-				<a href="/professors/{professor.id}">{professor.name}</a>
-				<form method="POST" action="?/deactivate" use:enhance>
-					<input type="hidden" name="id" value={professor.id} />
-					<button type="submit" class="btn btn-outline btn-small">Deactivate</button>
-				</form>
-			</li>
-		{:else}
-			<p>No professors yet. Add one above.</p>
-		{/each}
-	</ul>
+	<div class="students">
+		<h1>Students</h1>
 
-	{#if data.inactive.length > 0}
-		<button
-			type="button"
-			class="expand-toggle"
-			onclick={() => (showDeactivated = !showDeactivated)}
+		<ul class="professor-list">
+			{#each data.students as student (student.id)}
+				<li class="card professor-row">
+					<span>{student.name} <span class="house-tag">({student.house.name})</span></span>
+					<button
+						type="button"
+						class="btn btn-outline btn-small"
+						onclick={() => (studentToRemove = { id: student.id, name: student.name })}
+					>
+						Remove
+					</button>
+				</li>
+			{:else}
+				<p>No students yet. Add one below.</p>
+			{/each}
+		</ul>
+
+		<form
+			method="POST"
+			action="?/removeStudent"
+			use:enhance={() => {
+				return async ({ update }) => {
+					await update();
+					studentToRemove = null;
+				};
+			}}
+			bind:this={removeStudentForm}
 		>
-			{showDeactivated ? 'Hide' : 'Show'} deactivated professors ({data.inactive.length})
-		</button>
-
-		{#if showDeactivated}
-			<ul class="professor-list deactivated">
-				{#each data.inactive as professor (professor.id)}
-					<li class="card professor-row muted">
-						<span>{professor.name}</span>
-						<form method="POST" action="?/reactivate" use:enhance>
-							<input type="hidden" name="id" value={professor.id} />
-							<button type="submit" class="btn btn-outline btn-small">Reactivate</button>
-						</form>
-					</li>
-				{/each}
-			</ul>
-		{/if}
-	{/if}
-
-	<div class="card add-card">
-		<h3>Add Professor</h3>
-		<form method="POST" action="?/add" use:enhance class="add-form">
-			<input type="text" name="name" placeholder="Professor name" required />
-			<button type="submit" class="btn btn-primary">Add Professor</button>
+			<input type="hidden" name="id" value={studentToRemove?.id ?? ''} />
 		</form>
-		{#if form?.action === 'add' && form?.error}
-			<p class="error">{form.error}</p>
-		{/if}
+
+		<ConfirmDialog
+			open={studentToRemove !== null}
+			title="Remove student?"
+			message={`This permanently removes ${studentToRemove?.name ?? 'this student'} and cannot be undone.`}
+			confirmLabel="Remove student"
+			onConfirm={() => removeStudentForm?.requestSubmit()}
+			onCancel={() => (studentToRemove = null)}
+		/>
+
+		<div class="card add-card">
+			<h3>Add Student</h3>
+			<form method="POST" action="?/addStudent" use:enhance class="add-form">
+				<input type="text" name="name" placeholder="Student name" required />
+				<select name="houseId" required>
+					<option value="" disabled selected>House</option>
+					{#each data.houses as house (house.id)}
+						<option value={house.id}>{house.name}</option>
+					{/each}
+				</select>
+				<button type="submit" class="btn btn-primary">Add Student</button>
+			</form>
+			{#if form?.action === 'addStudent' && form?.error}
+				<p class="error">{form.error}</p>
+			{/if}
+		</div>
 	</div>
 
-	<h2>Students</h2>
+	<div class="reset">
+		<div class="card reset-card">
+			<h3>Reset house points</h3>
+			<p>Zero out every house's point total, e.g. at the end of a school year.</p>
+			<button
+				type="button"
+				class="btn btn-danger-outline"
+				onclick={() => (showResetConfirm = true)}
+			>
+				Reset all house points
+			</button>
+		</div>
 
-	<ul class="professor-list">
-		{#each data.students as student (student.id)}
-			<li class="card professor-row">
-				<span>{student.name} <span class="house-tag">({student.house.name})</span></span>
-				<button
-					type="button"
-					class="btn btn-outline btn-small"
-					onclick={() => (studentToRemove = { id: student.id, name: student.name })}
-				>
-					Remove
-				</button>
-			</li>
-		{:else}
-			<p>No students yet. Add one below.</p>
-		{/each}
-	</ul>
+		<form
+			method="POST"
+			action="?/resetAll"
+			use:enhance={() => {
+				return async ({ update }) => {
+					await update();
+					showResetConfirm = false;
+				};
+			}}
+			bind:this={resetForm}
+		></form>
 
-	<div class="card add-card">
-		<h3>Add Student</h3>
-		<form method="POST" action="?/addStudent" use:enhance class="add-form">
-			<input type="text" name="name" placeholder="Student name" required />
-			<select name="houseId" required>
-				<option value="" disabled selected>House</option>
-				{#each data.houses as house (house.id)}
-					<option value={house.id}>{house.name}</option>
-				{/each}
-			</select>
-			<button type="submit" class="btn btn-primary">Add Student</button>
-		</form>
-		{#if form?.action === 'addStudent' && form?.error}
-			<p class="error">{form.error}</p>
-		{/if}
-	</div>
-
-	<div class="card reset-card">
-		<h3>Reset house points</h3>
-		<p>Zero out every house's point total, e.g. at the end of a school year.</p>
-		<button type="button" class="btn btn-danger-outline" onclick={() => (showResetConfirm = true)}>
-			Reset all house points
-		</button>
+		<ConfirmDialog
+			open={showResetConfirm}
+			title="Reset all house points?"
+			message="This sets every house's point total back to 0 and cannot be undone."
+			confirmLabel="Reset points"
+			onConfirm={() => resetForm?.requestSubmit()}
+			onCancel={() => (showResetConfirm = false)}
+		/>
 	</div>
 </section>
 
 <style>
 	.page {
-		max-width: 40rem;
+		display: grid;
+		grid-template:
+			'professors students' min-content
+			'reset students' min-content
+			/ 1fr 1fr;
+		gap: 2rem;
+		max-width: 80rem;
 		margin: 0 auto;
 		padding: var(--space-4) var(--space-2);
+	}
+
+	.professors {
+		grid-area: professors;
+	}
+
+	.students {
+		grid-area: students;
+	}
+
+	.reset {
+		grid-area: reset;
 	}
 
 	.add-card {
