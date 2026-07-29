@@ -27,6 +27,8 @@ export const pointTransactions = pgTable('point_transactions', {
 		.notNull()
 		.references(() => houses.id),
 	professorId: uuid('professor_id').references(() => professors.id),
+	studentId: uuid('student_id').references(() => students.id),
+	message: text('message'),
 	delta: integer('delta').notNull(),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 });
