@@ -3,6 +3,7 @@ import { db } from './index';
 import { houses, pointTransactions, type House } from './schema';
 import { clampPoints } from '$lib/util/points';
 import { publishHouseUpdate } from '../house-events';
+import { notifyNewTransaction } from '../message-feed';
 
 export async function listHouses(): Promise<House[]> {
 	return db.query.houses.findMany({ orderBy: (h, { asc }) => [asc(h.name)] });
@@ -15,7 +16,7 @@ export async function applyPointDelta(
 	options: { studentId?: string | null; message?: string | null } = {}
 ): Promise<House> {
 	const { studentId = null, message = null } = options;
-	const updated = await db.transaction(async (tx) => {
+	const { house: updated, transactionId } = await db.transaction(async (tx) => {
 		const house = await tx.query.houses.findFirst({ where: eq(houses.id, houseId) });
 		if (!house) throw new Error('House not found');
 
@@ -25,12 +26,16 @@ export async function applyPointDelta(
 			.where(eq(houses.id, houseId))
 			.returning();
 
-		await tx.insert(pointTransactions).values({ houseId, professorId, studentId, message, delta });
+		const [inserted] = await tx
+			.insert(pointTransactions)
+			.values({ houseId, professorId, studentId, message, delta })
+			.returning({ id: pointTransactions.id });
 
-		return updated;
+		return { house: updated, transactionId: inserted.id };
 	});
 
 	publishHouseUpdate(updated);
+	await notifyNewTransaction(transactionId, message);
 	return updated;
 }
 
