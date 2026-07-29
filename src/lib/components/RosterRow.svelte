@@ -5,12 +5,14 @@
 		label,
 		href,
 		tag,
+		labelColor,
 		muted = false,
 		action
 	}: {
 		label: string;
 		href?: string;
 		tag?: string;
+		labelColor?: string;
 		muted?: boolean;
 		action: Snippet;
 	} = $props();
@@ -18,9 +20,9 @@
 
 <li class="card row" class:muted>
 	{#if href}
-		<a {href}>{label}</a>
+		<a {href} style:color={labelColor}>{label}</a>
 	{:else}
-		<span>{label}{#if tag} <span class="tag">({tag})</span>{/if}</span>
+		<span style:color={labelColor}>{label}{#if tag} <span class="tag">({tag})</span>{/if}</span>
 	{/if}
 	{@render action()}
 </li>

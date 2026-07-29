@@ -6,6 +6,7 @@
 	import RosterRow from '$lib/components/RosterRow.svelte';
 	import AddCard from '$lib/components/AddCard.svelte';
 	import ConfirmSubmitForm from '$lib/components/ConfirmSubmitForm.svelte';
+	import { houseColors } from '$lib/util/house-colors';
 
 	let {
 		students,
@@ -33,7 +34,12 @@
 				Remove
 			</button>
 		{/snippet}
-		<RosterRow label={student.name} tag={student.house.name} {action} />
+		<RosterRow
+			label={student.name}
+			tag={student.house.name}
+			labelColor={houseColors[student.house.slug]}
+			{action}
+		/>
 	{:else}
 		<p>No students yet. Add one below.</p>
 	{/each}
