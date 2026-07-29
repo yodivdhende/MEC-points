@@ -6,7 +6,7 @@
 	import RosterRow from '$lib/components/RosterRow.svelte';
 	import AddCard from '$lib/components/AddCard.svelte';
 	import ConfirmSubmitForm from '$lib/components/ConfirmSubmitForm.svelte';
-	import { houseColors } from '$lib/util/house-colors';
+	import { houseColors } from '$lib/assets/house-colors';
 
 	let {
 		students,
