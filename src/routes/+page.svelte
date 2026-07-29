@@ -6,6 +6,9 @@
 	import backgroundVideo from '$lib/assets/background.mp4';
 	import backgroundImage from '$lib/assets/background.png';
 
+	const BANNER_FADE_MS = 500;
+	const BANNER_GAP_MS = 500;
+
 	type FeedMessage = {
 		id: string;
 		houseSlug: string;
@@ -28,6 +31,7 @@
 	const houses = $state(data.houses.map((house) => ({ ...house })));
 	let messages = $state<FeedMessage[]>(data.messages);
 	let currentIndex = $state(0);
+	let bannerVisible = $state(true);
 
 	let videoFailed = $state(false);
 
@@ -49,13 +53,19 @@
 
 	$effect(() => {
 		const timer = setInterval(() => {
-			const cutoff = Date.now() - EXPIRY_WINDOW_MS;
-			messages = messages.filter((m) => new Date(m.createdAt).getTime() >= cutoff);
-			if (messages.length === 0) {
-				currentIndex = 0;
-			} else {
-				currentIndex = (currentIndex + 1) % messages.length;
-			}
+			bannerVisible = false;
+			setTimeout(() => {
+				const cutoff = Date.now() - EXPIRY_WINDOW_MS;
+				messages = messages.filter((m) => new Date(m.createdAt).getTime() >= cutoff);
+				if (messages.length === 0) {
+					currentIndex = 0;
+				} else {
+					currentIndex = (currentIndex + 1) % messages.length;
+				}
+				setTimeout(() => {
+					bannerVisible = true;
+				}, BANNER_GAP_MS);
+			}, BANNER_FADE_MS);
 		}, ROTATION_INTERVAL_MS);
 		return () => clearInterval(timer);
 	});
@@ -81,23 +91,30 @@
 			<HouseOverviewCard name={house.name} crestSrc={crests[house.slug]} points={house.points} />
 		{/each}
 	</ul>
-	{#if currentMessage}
-		<RecentMessageBanner
-			houseName={currentMessage.houseName}
-			crestSrc={crests[currentMessage.houseSlug]}
-			professorName={currentMessage.professorName}
-			studentName={currentMessage.studentName}
-			delta={currentMessage.delta}
-			message={currentMessage.message}
-		/>
-	{/if}
+	<div class="messages">
+		{#if currentMessage && bannerVisible}
+			<RecentMessageBanner
+				houseName={currentMessage.houseName}
+				crestSrc={crests[currentMessage.houseSlug]}
+				professorName={currentMessage.professorName}
+				studentName={currentMessage.studentName}
+				delta={currentMessage.delta}
+				message={currentMessage.message}
+				fadeMs={BANNER_FADE_MS}
+			/>
+		{/if}
+	</div>
 </section>
 
 <style>
 	.page {
 		position: relative;
 		min-height: 100vh;
-		display: flex;
+		display: grid;
+		grid-template:
+			'houses' 2fr
+			'messages' 1fr
+			/ 100%;
 		align-items: center;
 		padding: var(--space-4);
 		overflow: hidden;
@@ -129,5 +146,10 @@
 		justify-content: center;
 		gap: var(--space-3);
 		width: 100%;
+	}
+
+	.messages {
+		grid-area: messages;
+		justify-self: center;
 	}
 </style>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { fade } from 'svelte/transition';
 	import { formatSignedDelta } from '$lib/util/points';
 
 	let {
@@ -7,7 +8,8 @@
 		professorName,
 		studentName,
 		delta,
-		message
+		message,
+		fadeMs = 500
 	}: {
 		houseName: string;
 		crestSrc: string;
@@ -15,12 +17,13 @@
 		studentName: string | null;
 		delta: number;
 		message: string;
+		fadeMs?: number;
 	} = $props();
 </script>
 
-<div class="card banner">
+<div class="card banner" transition:fade={{ duration: fadeMs }}>
 	<img class="banner-crest" src={crestSrc} alt="{houseName} crest" />
-	<p class="banner-names">
+	<div class="banner-names">
 		<strong>{professorName ?? 'Reset'}</strong>
 		<span class="banner-arrow">→</span>
 		{#if studentName}
@@ -28,7 +31,7 @@
 		{:else}
 			<em>{houseName}</em> (whole house)
 		{/if}
-	</p>
+	</div>
 	<span class="banner-delta" class:positive={delta > 0} class:negative={delta < 0}>
 		{formatSignedDelta(delta)}
 	</span>
@@ -37,10 +40,7 @@
 
 <style>
 	.banner {
-		position: absolute;
-		left: 50%;
-		bottom: var(--space-3);
-		transform: translateX(-50%);
+		grid-area: messages;
 		display: grid;
 		grid-template:
 			'crest names' min-content
@@ -51,6 +51,7 @@
 		column-gap: 1em;
 		max-width: min(90vw, 60rem);
 		padding: 1em;
+		padding-right: 1.5em;
 	}
 
 	.banner-crest {
@@ -63,10 +64,11 @@
 
 	.banner-names {
 		grid-area: names;
+		display: flex;
+		margin: 0;
 		font-family: var(--font-display);
 		font-size: clamp(0.9rem, 1.6vw, 1.25rem);
 		color: var(--color-bark);
-		margin: 0;
 	}
 
 	.banner-delta {
@@ -93,8 +95,7 @@
 		font-size: clamp(0.8rem, 1.3vw, 1.1rem);
 		color: var(--color-ink);
 		margin: 0.15em 0 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		overflow-wrap: break-word;
+		word-break: break-word;
 	}
 </style>
