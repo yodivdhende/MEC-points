@@ -11,8 +11,10 @@ export async function listHouses(): Promise<House[]> {
 export async function applyPointDelta(
 	houseId: string,
 	professorId: string | null,
-	delta: number
+	delta: number,
+	options: { studentId?: string | null; message?: string | null } = {}
 ): Promise<House> {
+	const { studentId = null, message = null } = options;
 	const updated = await db.transaction(async (tx) => {
 		const house = await tx.query.houses.findFirst({ where: eq(houses.id, houseId) });
 		if (!house) throw new Error('House not found');
@@ -23,7 +25,7 @@ export async function applyPointDelta(
 			.where(eq(houses.id, houseId))
 			.returning();
 
-		await tx.insert(pointTransactions).values({ houseId, professorId, delta });
+		await tx.insert(pointTransactions).values({ houseId, professorId, studentId, message, delta });
 
 		return updated;
 	});

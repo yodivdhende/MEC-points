@@ -30,11 +30,12 @@ Shared primitives these are built from:
 
 ## Point submission — `/professors/[id]`
 
-Lists the 5 houses with add/subtract buttons; taps update the display instantly and are batched into a single request per house after 5 seconds of inactivity.
+A single-target form: the professor searches for a student or a whole house, sets a point delta, optionally adds a message, then submits explicitly. Each submission is one `?/adjust` request (no more per-house tap batching).
 
-- `+page.server.ts` — `load` fetches the professor and all houses; `actions.adjust` validates and applies a delta via `applyPointDelta` (`src/lib/server/db/houses.ts`), returning the authoritative clamped total.
-- `+page.svelte` — instantiates one `HousePoints` (`src/lib/state/house-points.svelte.ts`) per house, which owns the optimistic display, the debounce/batch timer, the `?/adjust` fetch + reconciliation, and a `sendBeacon` flush on `beforeunload`/`pagehide` so pending taps aren't lost when navigating away.
-- `HouseCard` (`src/lib/components/HouseCard.svelte`) is the presentational component — crest, name, status label, +/- buttons — driven entirely by props from the `HousePoints` instances.
+- `+page.server.ts` — `load` fetches the professor, all houses, and all students (`listStudents`, joined with house for display). `actions.adjust` reads `houseId`, optional `studentId`, `delta`, and optional `message` from the form, validates them, and applies the change via `applyPointDelta` (`src/lib/server/db/houses.ts`), returning the authoritative clamped total.
+- `+page.svelte` — holds the selected `Target` (house or student), the pending `delta` (adjusted via +/- buttons), and the `message` textarea. On successful submit it resets the form and shows a brief "Saved: ..." confirmation; `target`/`delta`/`message` are cleared so the professor can immediately submit for the next student.
+- `TargetPicker` (`src/lib/components/TargetPicker.svelte`) is a searchable combobox listing every house ("X (whole house)") and every student, filtered by substring match on typed text. Selecting a student resolves its `houseId` for the submission. Student option labels are tinted by house via `src/lib/assets/house-colors.ts`. The `Target` type is exported from the sibling `target-picker.ts` (not the `.svelte` file) — importing types from `<script module>` in a `.svelte` file tripped up `svelte-check`'s control-flow narrowing for `Target | null` locals elsewhere, so the type lives in a plain `.ts` file instead.
+- A submission optionally names a specific student and/or carries a free-text `message` (capped at 280 chars server-side), both stored on the `point_transactions` row (see root `CLAUDE.md` data model note) for the not-yet-built main-page display of recent point changes.
 
 ## Notes
 
