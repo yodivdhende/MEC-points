@@ -45,4 +45,15 @@
 	.reset {
 		grid-area: reset;
 	}
+
+	@media (max-width: 40rem) {
+		.page {
+			grid-template:
+				'professors' min-content
+				'students' min-content
+				'reset' min-content
+				/ 1fr;
+			gap: var(--space-4);
+		}
+	}
 </style>
