@@ -6,12 +6,18 @@ import {
 	insertProfessor,
 	setProfessorActive
 } from '$lib/server/db/professors';
-import { resetAllHousePoints } from '$lib/server/db/houses';
+import { listStudents, insertStudent, deleteStudent } from '$lib/server/db/students';
+import { listHouses, resetAllHousePoints } from '$lib/server/db/houses';
 import { isUuid } from '$lib/util/is-uuid';
 
 export const load: PageServerLoad = async () => {
-	const [active, inactive] = await Promise.all([listActiveProfessors(), listInactiveProfessors()]);
-	return { active, inactive };
+	const [active, inactive, students, houses] = await Promise.all([
+		listActiveProfessors(),
+		listInactiveProfessors(),
+		listStudents(),
+		listHouses()
+	]);
+	return { active, inactive, students, houses };
 };
 
 export const actions: Actions = {
@@ -46,5 +52,28 @@ export const actions: Actions = {
 	resetAll: async () => {
 		await resetAllHousePoints();
 		return { action: 'resetAll', success: true };
+	},
+
+	addStudent: async ({ request }) => {
+		const form = await request.formData();
+		const name = (form.get('name') ?? '').toString().trim();
+		const houseId = String(form.get('houseId') ?? '');
+		if (!name) {
+			return fail(400, { action: 'addStudent', error: 'Name is required.', name });
+		}
+		if (!isUuid(houseId)) {
+			return fail(400, { action: 'addStudent', error: 'House is required.', name });
+		}
+		await insertStudent(name, houseId);
+		return { action: 'addStudent', success: true };
+	},
+
+	removeStudent: async ({ request }) => {
+		const id = String((await request.formData()).get('id') ?? '');
+		if (!isUuid(id)) {
+			return fail(400, { action: 'removeStudent', error: 'Invalid student.' });
+		}
+		await deleteStudent(id);
+		return { action: 'removeStudent', success: true };
 	}
 };

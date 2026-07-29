@@ -26,9 +26,12 @@ MEC-Points is a webapp for tracking and displaying **house points** at a magical
 
 4. **Yearly score reset** — _(implemented)_ a button on `/professors` (behind a confirmation modal, since this is destructive and irreversible) zeroes every house's point total in one go. See `src/routes/professors/CLAUDE.md` for implementation details.
 
+5. **Student roster** — _(implemented)_ a form on `/professors` for adding and removing students, each assigned to one of the 5 houses. Students aren't yet linked to `point_transactions` — this is just a roster. See `src/routes/professors/CLAUDE.md` for implementation details.
+
 ## Data model
 
 - `professors` — `id` (UUID), `name`, `active`.
+- `students` — `id` (UUID), `name`, `houseId` (required FK to `houses`). Not referenced by any other table, so removal is a hard delete (see `src/lib/server/db/students.ts`).
 - `houses` — `id` (UUID), `name`, `slug` (stable key used to seed the 5 fixed houses and to look up their crest asset via `src/lib/assets/crests.ts`), `points` (cached running total, clamped to -99..999).
 - `point_transactions` — `id` (UUID), `houseId`, `professorId`, `delta`, `createdAt`. One row per submitted point change; `houses.points` is kept in sync with it inside a DB transaction (`applyPointDelta` in `src/lib/server/db/houses.ts`). `professorId` is nullable: the yearly reset (`resetAllHousePoints`) isn't tied to one professor, so its rows are recorded with `professorId = null`. Any future "points awarded per professor" query must filter `WHERE professor_id IS NOT NULL` to exclude these.
 - The 5 houses are seeded via `pnpm db:seed` (`src/lib/server/db/seed.ts`), which is idempotent (`onConflictDoNothing` on `slug`) and must be run manually after `pnpm db:push` on a fresh database — nothing seeds them automatically.

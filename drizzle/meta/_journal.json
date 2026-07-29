@@ -15,6 +15,20 @@
       "when": 1785249672232,
       "tag": "0001_secret_pestilence",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785311086616,
+      "tag": "0002_organic_mandroid",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1785312490360,
+      "tag": "0003_numerous_ogun",
+      "breakpoints": true
     }
   ]
 }
