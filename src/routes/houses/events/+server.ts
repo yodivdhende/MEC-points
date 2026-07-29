@@ -1,17 +1,39 @@
 import { onHouseUpdate } from '$lib/server/house-events';
+import { onMessage } from '$lib/server/message-feed';
 import type { RequestHandler } from './$types';
 
 const HEARTBEAT_INTERVAL_MS = 25_000;
 
 export const GET: RequestHandler = () => {
 	const encoder = new TextEncoder();
-	let unsubscribe: () => void;
+	let unsubscribeHouse: () => void;
+	let unsubscribeMessage: () => void;
 	let heartbeat: ReturnType<typeof setInterval>;
 
 	const stream = new ReadableStream({
 		start(controller) {
-			unsubscribe = onHouseUpdate((house) => {
-				const payload = { id: house.id, slug: house.slug, points: house.points };
+			unsubscribeHouse = onHouseUpdate((house) => {
+				const payload = {
+					type: 'house' as const,
+					id: house.id,
+					slug: house.slug,
+					points: house.points
+				};
+				controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+			});
+
+			unsubscribeMessage = onMessage((item) => {
+				const payload = {
+					type: 'message' as const,
+					id: item.id,
+					houseSlug: item.houseSlug,
+					houseName: item.houseName,
+					professorName: item.professorName,
+					studentName: item.studentName,
+					delta: item.delta,
+					message: item.message,
+					createdAt: item.createdAt.toISOString()
+				};
 				controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
 			});
 
@@ -21,7 +43,8 @@ export const GET: RequestHandler = () => {
 		},
 		cancel() {
 			clearInterval(heartbeat);
-			unsubscribe();
+			unsubscribeHouse();
+			unsubscribeMessage();
 		}
 	});
 
