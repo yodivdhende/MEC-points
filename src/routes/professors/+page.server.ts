@@ -6,12 +6,17 @@ import {
 	insertProfessor,
 	setProfessorActive
 } from '$lib/server/db/professors';
+import { listStudents, insertStudent, deleteStudent } from '$lib/server/db/students';
 import { resetAllHousePoints } from '$lib/server/db/houses';
 import { isUuid } from '$lib/util/is-uuid';
 
 export const load: PageServerLoad = async () => {
-	const [active, inactive] = await Promise.all([listActiveProfessors(), listInactiveProfessors()]);
-	return { active, inactive };
+	const [active, inactive, students] = await Promise.all([
+		listActiveProfessors(),
+		listInactiveProfessors(),
+		listStudents()
+	]);
+	return { active, inactive, students };
 };
 
 export const actions: Actions = {
@@ -46,5 +51,24 @@ export const actions: Actions = {
 	resetAll: async () => {
 		await resetAllHousePoints();
 		return { action: 'resetAll', success: true };
+	},
+
+	addStudent: async ({ request }) => {
+		const form = await request.formData();
+		const name = (form.get('name') ?? '').toString().trim();
+		if (!name) {
+			return fail(400, { action: 'addStudent', error: 'Name is required.', name });
+		}
+		await insertStudent(name);
+		return { action: 'addStudent', success: true };
+	},
+
+	removeStudent: async ({ request }) => {
+		const id = String((await request.formData()).get('id') ?? '');
+		if (!isUuid(id)) {
+			return fail(400, { action: 'removeStudent', error: 'Invalid student.' });
+		}
+		await deleteStudent(id);
+		return { action: 'removeStudent', success: true };
 	}
 };

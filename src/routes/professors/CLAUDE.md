@@ -10,6 +10,10 @@ Lists active/inactive professors with `add`/`deactivate`/`reactivate` form actio
 
 This page also has a "Reset all house points" button, for the yearly score reset. It isn't tied to a specific professor, so it's gated behind `ConfirmDialog` (`src/lib/components/ConfirmDialog.svelte`, a plain `<dialog>`-based confirmation modal — the general-purpose one to reach for if another destructive action needs confirmation later) rather than executing immediately like `deactivate`/`reactivate`. Confirming submits the `resetAll` action, which calls `resetAllHousePoints` (`src/lib/server/db/houses.ts`) — this zeroes every house via `applyPointDelta` per house (delta = negative of its current total), so it logs a `point_transactions` row per house and propagates live to the `/` overview screen exactly like a normal point submission. Since the reset isn't attributed to one professor, those rows have `professorId = null` (see root `CLAUDE.md` data model note).
 
+## Student management — `/professors`
+
+Same page also lists all students with `addStudent`/`removeStudent` form actions, backed by `src/lib/server/db/students.ts`. Unlike professors, students aren't referenced by any other table (no attribution to preserve), so removal is a hard `DELETE` rather than a soft-deactivate — gated behind the same `ConfirmDialog` used for the house-points reset, since it's irreversible. There's no house assignment on a student yet; add one (a `houseId` FK) only when a feature actually needs it.
+
 ## Point submission — `/professors/[id]`
 
 Lists the 5 houses with add/subtract buttons; taps update the display instantly and are batched into a single request per house after 5 seconds of inactivity.

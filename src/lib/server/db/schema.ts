@@ -6,6 +6,11 @@ export const professors = pgTable('professors', {
 	active: boolean('active').notNull().default(true)
 });
 
+export const students = pgTable('students', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	name: text('name').notNull()
+});
+
 export const houses = pgTable('houses', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
@@ -25,6 +30,8 @@ export const pointTransactions = pgTable('point_transactions', {
 
 export type Professor = typeof professors.$inferSelect;
 export type NewProfessor = typeof professors.$inferInsert;
+export type Student = typeof students.$inferSelect;
+export type NewStudent = typeof students.$inferInsert;
 export type House = typeof houses.$inferSelect;
 export type NewHouse = typeof houses.$inferInsert;
 export type PointTransaction = typeof pointTransactions.$inferSelect;

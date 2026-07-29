@@ -8,6 +8,9 @@
 	let showDeactivated = $state(false);
 	let showResetConfirm = $state(false);
 	let resetForm: HTMLFormElement | undefined = $state();
+
+	let studentToRemove: { id: string; name: string } | null = $state(null);
+	let removeStudentForm: HTMLFormElement | undefined = $state();
 </script>
 
 <section class="page">
@@ -32,6 +35,29 @@
 		confirmLabel="Reset points"
 		onConfirm={() => resetForm?.requestSubmit()}
 		onCancel={() => (showResetConfirm = false)}
+	/>
+
+	<form
+		method="POST"
+		action="?/removeStudent"
+		use:enhance={() => {
+			return async ({ update }) => {
+				await update();
+				studentToRemove = null;
+			};
+		}}
+		bind:this={removeStudentForm}
+	>
+		<input type="hidden" name="id" value={studentToRemove?.id ?? ''} />
+	</form>
+
+	<ConfirmDialog
+		open={studentToRemove !== null}
+		title="Remove student?"
+		message={`This permanently removes ${studentToRemove?.name ?? 'this student'} and cannot be undone.`}
+		confirmLabel="Remove student"
+		onConfirm={() => removeStudentForm?.requestSubmit()}
+		onCancel={() => (studentToRemove = null)}
 	/>
 
 	<ul class="professor-list">
@@ -79,6 +105,36 @@
 			<button type="submit" class="btn btn-primary">Add Professor</button>
 		</form>
 		{#if form?.action === 'add' && form?.error}
+			<p class="error">{form.error}</p>
+		{/if}
+	</div>
+
+	<h2>Students</h2>
+
+	<ul class="professor-list">
+		{#each data.students as student (student.id)}
+			<li class="card professor-row">
+				<span>{student.name}</span>
+				<button
+					type="button"
+					class="btn btn-outline btn-small"
+					onclick={() => (studentToRemove = { id: student.id, name: student.name })}
+				>
+					Remove
+				</button>
+			</li>
+		{:else}
+			<p>No students yet. Add one below.</p>
+		{/each}
+	</ul>
+
+	<div class="card add-card">
+		<h3>Add Student</h3>
+		<form method="POST" action="?/addStudent" use:enhance class="add-form">
+			<input type="text" name="name" placeholder="Student name" required />
+			<button type="submit" class="btn btn-primary">Add Student</button>
+		</form>
+		{#if form?.action === 'addStudent' && form?.error}
 			<p class="error">{form.error}</p>
 		{/if}
 	</div>
