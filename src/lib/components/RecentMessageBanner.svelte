@@ -18,49 +18,51 @@
 	} = $props();
 </script>
 
-<div class="card message-banner">
+<div class="card banner">
 	<img class="banner-crest" src={crestSrc} alt="{houseName} crest" />
-	<div class="banner-body">
-		<p class="banner-line">
-			<strong>{professorName ?? 'Reset'}</strong>
-			<span class="banner-arrow">→</span>
-			{#if studentName}
-				<strong>{studentName}</strong>
-			{:else}
-				<em>{houseName}</em> (whole house)
-			{/if}
-			<span class="banner-delta" class:positive={delta > 0} class:negative={delta < 0}>
-				{formatSignedDelta(delta)}
-			</span>
-		</p>
-		<p class="banner-message">&ldquo;{message}&rdquo;</p>
-	</div>
+	<p class="banner-names">
+		<strong>{professorName ?? 'Reset'}</strong>
+		<span class="banner-arrow">→</span>
+		{#if studentName}
+			<strong>{studentName}</strong>
+		{:else}
+			<em>{houseName}</em> (whole house)
+		{/if}
+	</p>
+	<span class="banner-delta" class:positive={delta > 0} class:negative={delta < 0}>
+		{formatSignedDelta(delta)}
+	</span>
+	<p class="banner-message">&ldquo;{message}&rdquo;</p>
 </div>
 
 <style>
-	.message-banner {
+	.banner {
 		position: absolute;
 		left: 50%;
 		bottom: var(--space-3);
 		transform: translateX(-50%);
-		display: flex;
+		display: grid;
+		grid-template:
+			'crest names' min-content
+			'crest delta' min-content
+			'crest message' min-content
+			/ min-content 1fr;
 		align-items: center;
-		gap: var(--space-2);
+		column-gap: 1em;
 		max-width: min(90vw, 60rem);
+		padding: 1em;
 	}
 
 	.banner-crest {
-		width: clamp(2rem, 4vw, 3.5rem);
-		height: clamp(2rem, 4vw, 3.5rem);
+		grid-area: crest;
+		width: clamp(2rem, 6vw, 10rem);
+		height: clamp(2rem, 6vw, 10rem);
 		object-fit: contain;
 		flex-shrink: 0;
 	}
 
-	.banner-body {
-		min-width: 0;
-	}
-
-	.banner-line {
+	.banner-names {
+		grid-area: names;
 		font-family: var(--font-display);
 		font-size: clamp(0.9rem, 1.6vw, 1.25rem);
 		color: var(--color-bark);
@@ -68,8 +70,12 @@
 	}
 
 	.banner-delta {
+		grid-area: delta;
 		font-weight: 700;
 		font-variant-numeric: tabular-nums;
+		font-size: 1.2 em;
+		font-weight: bold;
+		justify-self: center;
 	}
 
 	.banner-delta.positive {
@@ -81,6 +87,7 @@
 	}
 
 	.banner-message {
+		grid-area: message;
 		font-family: var(--font-body);
 		font-style: italic;
 		font-size: clamp(0.8rem, 1.3vw, 1.1rem);
