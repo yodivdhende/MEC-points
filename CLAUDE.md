@@ -12,6 +12,8 @@ MEC-Points is a webapp for tracking and displaying **house points** at a magical
 
 - **SvelteKit** (Svelte 5, TypeScript) — app framework
 - **Drizzle ORM** + **Postgres** — data layer (`src/lib/server/db/`)
+- Plain CSS (no Tailwind/CSS framework) — theme tokens in `src/lib/styles/theme.css`
+- **layerchart** — charting library used on `/statistics` (see `src/routes/statistics/CLAUDE.md`); its lower-level components don't require Tailwind, only `layerchart/core.css`
 - **pnpm** — package manager
 - Schema changes go through Drizzle migrations (`pnpm db:generate` then `pnpm db:push` locally), not manual/hand-edited SQL. `pnpm db:studio` opens a DB browser for inspecting/adjusting data.
 - **Deployment (Railway):** the generated SQL migrations in `drizzle/` are applied to the production database automatically via `pnpm db:migrate` (`src/lib/server/db/migrate.ts`, using `drizzle-orm`'s migrator), configured as the Railway service's Pre-Deploy Command — it runs before each new deploy starts serving traffic. Seeding the 5 houses (`pnpm db:seed`) is still a manual, one-time step on a fresh database.
@@ -22,7 +24,7 @@ MEC-Points is a webapp for tracking and displaying **house points** at a magical
 
 2. **Professor point submission** — _(implemented)_ each professor has their own page to submit a point change (positive or negative) to a searched-for student or a whole house, with an optional message. This is how house totals get updated. Every change is recorded in `point_transactions` (house, professor, optional student, optional message, delta, timestamp) alongside a denormalized running total on `houses.points`, which is what makes the statistics screen below feasible without re-summing history on every read. See `src/routes/professors/CLAUDE.md` for implementation details.
 
-3. **Statistics screen** — shows historical trends: which house has earned or lost the most points over a given period, and which professor has awarded the most points overall. Not yet built, but the `point_transactions` table already stores everything this needs.
+3. **Statistics screen** — _(partially implemented)_ `/statistics` shows a line graph of each house's point total over the last 4 days (one line per house, built with [layerchart](https://next.layerchart.com)), reconstructed from `point_transactions`. See `src/routes/statistics/CLAUDE.md` for implementation details. Not yet built: a period selector, and "which professor has awarded the most points overall" (the `point_transactions` table already stores everything that needs, too — see the `professorId IS NOT NULL` note below).
 
 4. **Yearly score reset** — _(implemented)_ a button on `/professors` (behind a confirmation modal, since this is destructive and irreversible) zeroes every house's point total in one go. See `src/routes/professors/CLAUDE.md` for implementation details.
 
