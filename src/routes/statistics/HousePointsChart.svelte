@@ -1,17 +1,33 @@
 <script lang="ts">
-	import { LineChart } from 'layerchart';
+	import { LineChart, Tooltip } from 'layerchart';
 	import 'layerchart/core.css';
 	import { scaleTime } from 'd3-scale';
 	import { crests } from '$lib/assets/crests';
 	import { houseColors } from '$lib/assets/house-colors';
-	import { MIN_POINTS } from '$lib/util/points';
+	import { MIN_POINTS, formatSignedDelta } from '$lib/util/points';
 
-	type ChartPoint = { timestamp: Date; points: number };
+	type ChartPoint = {
+		timestamp: Date;
+		points: number;
+		delta: number | null;
+		professorName: string | null;
+		studentName: string | null;
+		message: string | null;
+		houseSlug: string;
+		houseName: string;
+	};
 	type HouseSeries = {
 		houseId: string;
 		slug: string;
 		name: string;
-		points: { timestamp: string; points: number }[];
+		points: {
+			timestamp: string;
+			points: number;
+			delta: number | null;
+			professorName: string | null;
+			studentName: string | null;
+			message: string | null;
+		}[];
 	};
 
 	let { series }: { series: HouseSeries[] } = $props();
@@ -22,8 +38,10 @@
 			label: house.name,
 			color: houseColors[house.slug],
 			data: house.points.map((p): ChartPoint => ({
+				...p,
 				timestamp: new Date(p.timestamp),
-				points: p.points
+				houseSlug: house.slug,
+				houseName: house.name
 			})),
 			value: (d: ChartPoint) => d.points
 		}))
@@ -41,6 +59,14 @@
 	function xAxisFormat(date: Date) {
 		return new Intl.DateTimeFormat('en', { weekday: 'short', hour: 'numeric' }).format(date);
 	}
+
+	function tooltipTimeFormat(date: Date) {
+		return new Intl.DateTimeFormat('en', {
+			weekday: 'short',
+			hour: 'numeric',
+			minute: '2-digit'
+		}).format(date);
+	}
 </script>
 
 <div class="chart-wrap">
@@ -50,11 +76,40 @@
 		xScale={scaleTime()}
 		yDomain={[MIN_POINTS, highestCurrentPoints]}
 		series={chartSeries}
+		tooltipContext={{ mode: 'quadtree' }}
 		props={{
 			xAxis: { format: xAxisFormat },
 			spline: { strokeWidth: 2.5 }
 		}}
-	/>
+	>
+		{#snippet tooltip({ context })}
+			<Tooltip.Root {context}>
+				{#snippet children({ data }: { data: ChartPoint })}
+					<Tooltip.Header value={data.houseName} color={houseColors[data.houseSlug]} />
+					<Tooltip.List>
+						<Tooltip.Item label="When" value={tooltipTimeFormat(data.timestamp)} />
+						<Tooltip.Item label="Points" value={data.points} valueAlign="right" />
+						{#if data.delta !== null}
+							<Tooltip.Item
+								label="Change"
+								value={formatSignedDelta(data.delta)}
+								valueAlign="right"
+							/>
+						{/if}
+						{#if data.professorName}
+							<Tooltip.Item label="Professor" value={data.professorName} />
+						{/if}
+						{#if data.studentName}
+							<Tooltip.Item label="Student" value={data.studentName} />
+						{/if}
+						{#if data.message}
+							<Tooltip.Item label="Message" value={data.message} />
+						{/if}
+					</Tooltip.List>
+				{/snippet}
+			</Tooltip.Root>
+		{/snippet}
+	</LineChart>
 </div>
 
 <ul class="legend">

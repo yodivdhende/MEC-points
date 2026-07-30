@@ -11,7 +11,7 @@ export const load: PageServerLoad = async () => {
 		houseId: house.houseId,
 		slug: house.slug,
 		name: house.name,
-		points: house.points.map((p) => ({ timestamp: p.timestamp.toISOString(), points: p.points }))
+		points: house.points.map((p) => ({ ...p, timestamp: p.timestamp.toISOString() }))
 	}));
 
 	return { series };
