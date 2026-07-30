@@ -1,7 +1,8 @@
-import { asc, eq, gte } from 'drizzle-orm';
+import { and, asc, eq, gte, isNotNull, sql } from 'drizzle-orm';
 import { db } from './index';
 import { pointTransactions, professors, students } from './schema';
 import { listHouses } from './houses';
+import { listActiveProfessors } from './professors';
 import { clampPoints } from '$lib/util/points';
 
 export type HousePointsPoint = {
@@ -85,4 +86,44 @@ export async function getHousePointsHistory(since: Date): Promise<HousePointsSer
 
 		return { houseId: house.id, slug: house.slug, name: house.name, points };
 	});
+}
+
+export type ProfessorPointActivity = {
+	professorId: string;
+	professorName: string;
+	gifted: number; // sum of positive deltas in the window, >= 0
+	subtracted: number; // sum of negative deltas in the window, <= 0
+};
+
+// One row per active professor, even those with no activity in the window —
+// listActiveProfessors() drives membership, the aggregate query only fills in
+// sums. professorId is nullable on point_transactions (yearly-reset rows have
+// professorId = null), so isNotNull excludes those from the aggregate.
+export async function getProfessorPointActivity(since: Date): Promise<ProfessorPointActivity[]> {
+	const [activeProfessors, sums] = await Promise.all([
+		listActiveProfessors(),
+		db
+			.select({
+				professorId: pointTransactions.professorId,
+				gifted: sql<number>`coalesce(sum(${pointTransactions.delta}) filter (where ${pointTransactions.delta} > 0), 0)`,
+				subtracted: sql<number>`coalesce(sum(${pointTransactions.delta}) filter (where ${pointTransactions.delta} < 0), 0)`
+			})
+			.from(pointTransactions)
+			.where(and(isNotNull(pointTransactions.professorId), gte(pointTransactions.createdAt, since)))
+			.groupBy(pointTransactions.professorId)
+	]);
+
+	const byProfessor = new Map(sums.map((s) => [s.professorId as string, s]));
+
+	return activeProfessors
+		.map((prof) => {
+			const sum = byProfessor.get(prof.id);
+			return {
+				professorId: prof.id,
+				professorName: prof.name,
+				gifted: Number(sum?.gifted ?? 0),
+				subtracted: Number(sum?.subtracted ?? 0)
+			};
+		})
+		.sort((a, b) => b.gifted - b.subtracted - (a.gifted - a.subtracted));
 }
