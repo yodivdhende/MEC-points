@@ -4,7 +4,7 @@
 	import { scaleTime } from 'd3-scale';
 	import { crests } from '$lib/assets/crests';
 	import { houseColors } from '$lib/assets/house-colors';
-	import { MIN_POINTS, MAX_POINTS } from '$lib/util/points';
+	import { MIN_POINTS } from '$lib/util/points';
 
 	type ChartPoint = { timestamp: Date; points: number };
 	type HouseSeries = {
@@ -31,6 +31,13 @@
 
 	const allPoints = $derived(chartSeries.flatMap((s) => s.data));
 
+	// Current total = each house's last point in its series (the "now" entry
+	// getHousePointsHistory always appends). Only the max is adjusted here —
+	// the min stays pinned at MIN_POINTS since -99 is still the point floor.
+	const highestCurrentPoints = $derived(
+		Math.max(0, ...series.map((house) => house.points.at(-1)?.points ?? 0))
+	);
+
 	function xAxisFormat(date: Date) {
 		return new Intl.DateTimeFormat('en', { weekday: 'short', hour: 'numeric' }).format(date);
 	}
@@ -41,7 +48,7 @@
 		data={allPoints}
 		x={(d: ChartPoint) => d.timestamp}
 		xScale={scaleTime()}
-		yDomain={[MIN_POINTS, MAX_POINTS]}
+		yDomain={[MIN_POINTS, highestCurrentPoints]}
 		series={chartSeries}
 		props={{
 			xAxis: { format: xAxisFormat },
