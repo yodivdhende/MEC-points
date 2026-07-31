@@ -7,6 +7,10 @@
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 </script>
 
+<nav class="statistics-link">
+	<a href="/statistics">View statistics →</a>
+</nav>
+
 <section class="page">
 	<div class="professors">
 		<ProfessorRoster active={data.active} inactive={data.inactive} {form} />
@@ -22,6 +26,12 @@
 </section>
 
 <style>
+	.statistics-link {
+		max-width: 80rem;
+		margin: 0 auto;
+		padding: var(--space-4) var(--space-2) 0;
+	}
+
 	.page {
 		display: grid;
 		grid-template:
@@ -31,7 +41,7 @@
 		gap: 2rem;
 		max-width: 80rem;
 		margin: 0 auto;
-		padding: var(--space-4) var(--space-2);
+		padding: var(--space-2) var(--space-2) var(--space-4);
 	}
 
 	.professors {
