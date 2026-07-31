@@ -50,10 +50,14 @@
 	const allPoints = $derived(chartSeries.flatMap((s) => s.data));
 
 	// Current total = each house's last point in its series (the "now" entry
-	// getHousePointsHistory always appends). Only the max is adjusted here —
-	// the min stays pinned at MIN_POINTS since -99 is still the point floor.
+	// getHousePointsHistory always appends). Both bounds track the actual
+	// current totals rather than the full -99..999 point range, so the chart
+	// zooms to the data instead of squashing it into a sliver of the axis.
 	const highestCurrentPoints = $derived(
 		Math.max(0, ...series.map((house) => house.points.at(-1)?.points ?? 0))
+	);
+	const lowestCurrentPoints = $derived(
+		Math.min(0, ...series.map((house) => house.points.at(-1)?.points ?? MIN_POINTS))
 	);
 
 	function xAxisFormat(date: Date) {
@@ -74,7 +78,7 @@
 		data={allPoints}
 		x={(d: ChartPoint) => d.timestamp}
 		xScale={scaleTime()}
-		yDomain={[MIN_POINTS, highestCurrentPoints]}
+		yDomain={[lowestCurrentPoints, highestCurrentPoints]}
 		series={chartSeries}
 		tooltipContext={{ mode: 'quadtree' }}
 		props={{
