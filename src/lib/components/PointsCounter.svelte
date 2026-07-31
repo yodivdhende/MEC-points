@@ -29,7 +29,7 @@
 		font-family: var(--font-display);
 		font-weight: 700;
 		font-variant-numeric: tabular-nums;
-		font-size: clamp(2rem, 5vw, 4rem);
+		font-size: clamp(2rem, 6vw, 10rem);
 		color: var(--color-ink);
 		background: var(--color-parchment);
 		border: 1px solid var(--color-tan);

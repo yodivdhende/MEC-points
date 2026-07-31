@@ -22,15 +22,15 @@
 	}
 
 	.crest {
-		width: clamp(4rem, 20vw, 20rem);
-		height: clamp(4rem, 20vw, 20rem);
+		width: clamp(4rem, 14vw, 28rem);
+		height: clamp(4rem, 14vw, 28rem);
 		object-fit: contain;
 	}
 
 	.house-name {
 		font-family: var(--font-display);
 		font-weight: 700;
-		font-size: clamp(1rem, 1.8vw, 1.5rem);
+		font-size: clamp(1rem, 2.4vw, 4rem);
 		color: var(--color-bark);
 	}
 </style>
