@@ -3,13 +3,14 @@
 
 	let { char, direction }: { char: string; direction: 1 | -1 } = $props();
 
-	let previousChar = char;
-	let entryOffset = $state(0);
+	let previouschar = char;
+	let entryoffset = $state(0);
+	let duration = 1000;
 
 	$effect.pre(() => {
-		const isSignChange = char !== previousChar && (char === '-' || previousChar === '-');
-		entryOffset = isSignChange ? 0 : direction === 1 ? 16 : -16;
-		previousChar = char;
+		const issignchange = char !== previouschar && (char === '-' || previouschar === '-');
+		entryoffset = issignchange ? 0 : direction === 1 ? 16 : -16;
+		previouschar = char;
 	});
 </script>
 
@@ -17,9 +18,9 @@
 	{#key char}
 		<span
 			class="glyph"
-			in:fly={{ y: entryOffset, duration: 280 }}
-			out:fly={{ y: -entryOffset, duration: 280 }}
-		>{char}</span>
+			in:fly={{ y: entryoffset, duration }}
+			out:fly={{ y: -entryoffset, duration }}>{char}</span
+		>
 	{/key}
 </span>
 
@@ -30,7 +31,7 @@
 		overflow: hidden;
 		width: 1ch;
 		height: 1.2em;
-		line-height: 1.2em;
+		line-height: 0.9em;
 	}
 
 	.glyph {
