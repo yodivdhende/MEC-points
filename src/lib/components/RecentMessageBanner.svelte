@@ -49,15 +49,16 @@
 			/ min-content 1fr;
 		align-items: center;
 		column-gap: 1em;
-		max-width: min(90vw, 60rem);
+		max-width: min(90vw, 90rem);
 		padding: 1em;
 		padding-right: 1.5em;
+		font-size: clamp(1rem, 1.8vw, 2.25rem);
 	}
 
 	.banner-crest {
 		grid-area: crest;
-		width: clamp(2rem, 6vw, 10rem);
-		height: clamp(2rem, 6vw, 10rem);
+		width: clamp(2rem, 6vw, 16rem);
+		height: clamp(2rem, 6vw, 16rem);
 		object-fit: contain;
 		flex-shrink: 0;
 	}
@@ -67,7 +68,7 @@
 		display: flex;
 		margin: 0;
 		font-family: var(--font-display);
-		font-size: clamp(0.9rem, 1.6vw, 1.25rem);
+		font-size: clamp(0.9rem, 2vw, 3rem);
 		color: var(--color-bark);
 	}
 
@@ -75,8 +76,7 @@
 		grid-area: delta;
 		font-weight: 700;
 		font-variant-numeric: tabular-nums;
-		font-size: 1.2 em;
-		font-weight: bold;
+		font-size: clamp(1.5rem, 2.4vw, 4rem);
 		justify-self: center;
 	}
 
@@ -92,7 +92,7 @@
 		grid-area: message;
 		font-family: var(--font-body);
 		font-style: italic;
-		font-size: clamp(0.8rem, 1.3vw, 1.1rem);
+		font-size: clamp(0.8rem, 1.6vw, 2.5rem);
 		color: var(--color-ink);
 		margin: 0.15em 0 0;
 		overflow-wrap: break-word;
