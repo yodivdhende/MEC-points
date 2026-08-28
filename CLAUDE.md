@@ -16,7 +16,7 @@ MEC-Points is a webapp for tracking and displaying **house points** at a magical
 - **layerchart** — charting library used on `/statistics` (see `src/routes/statistics/CLAUDE.md`); its lower-level components don't require Tailwind, only `layerchart/core.css`
 - **pnpm** — package manager
 - Schema changes go through Drizzle migrations (`pnpm db:generate` then `pnpm db:push` locally), not manual/hand-edited SQL. `pnpm db:studio` opens a DB browser for inspecting/adjusting data.
-- **Deployment (Railway):** the generated SQL migrations in `drizzle/` are applied to the production database automatically via `pnpm db:migrate` (`src/lib/server/db/migrate.ts`, using `drizzle-orm`'s migrator), configured as the Railway service's Pre-Deploy Command — it runs before each new deploy starts serving traffic. Seeding the 5 houses (`pnpm db:seed`) is still a manual, one-time step on a fresh database.
+- **Deployment (Railway):** build/start/pre-deploy commands are checked into `railway.toml` (Railway's config-as-code) rather than living only in the dashboard. The generated SQL migrations in `drizzle/` are applied to the production database automatically via `pnpm db:migrate` (`src/lib/server/db/migrate.ts`, using `drizzle-orm`'s migrator), set as the `preDeployCommand` — it runs before each new deploy starts serving traffic. The only required env var is `DATABASE_URL` (see `.env.example`). Seeding the 5 houses (`pnpm db:seed`) is still a manual, one-time step on a fresh database.
 
 ## Core Features
 
